@@ -1,612 +1,85 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>資生堂 SHISEIDO - AI 美妝顧問</title>
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>輸入您的 AI Key</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Microsoft YaHei', 'PingFang TC', sans-serif;
-            background: linear-gradient(135deg, #fff5f5 0%, #ffffff 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            height: calc(100vh - 40px);
+            font-family: system-ui, sans-serif;
+            background: #fef2f2;
             display: flex;
-            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
         }
-
-        .header {
+        .card {
             background: white;
-            border-radius: 12px 12px 0 0;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            padding: 30px;
-            border-bottom: 4px solid #dc2626;
+            padding: 32px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            width: 360px;
             text-align: center;
         }
-
-        .header h1 {
-            color: #991b1b;
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-        }
-
-        .header p {
-            color: #6b7280;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .main-content {
-            flex: 1;
-            display: flex;
-            gap: 20px;
-            background: white;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            border-radius: 0 0 12px 12px;
-            padding: 20px;
-            overflow: hidden;
-        }
-
-        .chat-area {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .messages {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-            margin-bottom: 20px;
-            background: #fafafa;
-            border-radius: 8px;
-        }
-
-        .message {
-            display: flex;
-            margin-bottom: 16px;
-            animation: fadeIn 0.3s ease-in;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .message.user {
-            justify-content: flex-end;
-        }
-
-        .message-content {
-            max-width: 70%;
-            padding: 16px;
-            border-radius: 12px;
-            line-height: 1.6;
-        }
-
-        .message.user .message-content {
-            background: #dc2626;
-            color: white;
-        }
-
-        .message.assistant .message-content {
-            background: #f3f4f6;
-            color: #1f2937;
-        }
-
-        .loading {
-            display: flex;
-            gap: 8px;
-            padding: 16px;
-            background: #f3f4f6;
-            border-radius: 12px;
-            width: fit-content;
-        }
-
-        .loading-dot {
-            width: 8px;
-            height: 8px;
-            background: #9ca3af;
-            border-radius: 50%;
-            animation: bounce 1.4s infinite ease-in-out;
-        }
-
-        .loading-dot:nth-child(1) { animation-delay: -0.32s; }
-        .loading-dot:nth-child(2) { animation-delay: -0.16s; }
-
-        @keyframes bounce {
-            0%, 80%, 100% { transform: scale(0); }
-            40% { transform: scale(1); }
-        }
-
-        .quick-buttons {
-            margin-bottom: 20px;
-        }
-
-        .quick-buttons p {
-            font-size: 14px;
-            color: #6b7280;
-            font-weight: 500;
-            margin-bottom: 10px;
-        }
-
-        .quick-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-        }
-
-        .quick-btn {
-            background: #fef2f2;
-            color: #b91c1c;
-            border: none;
-            padding: 12px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            text-align: left;
-            font-size: 14px;
-            transition: all 0.2s;
-        }
-
-        .quick-btn:hover:not(:disabled) {
-            background: #fee2e2;
-            transform: translateY(-2px);
-        }
-
-        .quick-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .input-area {
-            display: flex;
-            gap: 10px;
-        }
-
-        .input-area input {
-            flex: 1;
-            padding: 16px;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
-            font-size: 15px;
-            outline: none;
-            transition: all 0.2s;
-        }
-
-        .input-area input:focus {
-            border-color: #dc2626;
-            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
-        }
-
-        .input-area input:disabled {
-            background: #f9fafb;
-            opacity: 0.6;
-        }
-
-        .send-btn {
-            background: #dc2626;
-            color: white;
-            border: none;
-            padding: 16px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .send-btn:hover:not(:disabled) {
-            background: #b91c1c;
-            transform: translateY(-2px);
-        }
-
-        .send-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .action-panel {
-            width: 280px;
-            background: #f9fafb;
-            border-radius: 8px;
-            padding: 20px;
-        }
-
-        .action-panel h3 {
-            color: #1f2937;
-            margin-bottom: 16px;
-            font-size: 18px;
-        }
-
-        .action-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .action-btn {
-            border: none;
-            color: white;
-            padding: 14px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            transition: all 0.2s;
-        }
-
-        .action-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-
-        .action-btn.gray {
-            background: #6b7280;
-        }
-
-        .action-btn.gray:hover {
-            background: #4b5563;
-        }
-
-        .action-btn.red {
-            background: #dc2626;
-        }
-
-        .action-btn.red:hover {
-            background: #b91c1c;
-        }
-
-        .info-box {
-            margin-top: 24px;
-            padding: 16px;
-            background: white;
-            border-radius: 8px;
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-top: 16px;
             border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 16px;
         }
-
-        .info-box p {
-            font-size: 12px;
+        button {
+            width: 100%;
+            margin-top: 20px;
+            padding: 12px;
+            background: #dc2626;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #b91c1c;
+        }
+        h1 {
+            color: #b91c1c;
+        }
+        p {
             color: #6b7280;
-            line-height: 1.5;
-        }
-
-        .sparkle {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-        }
-
-        @media (max-width: 768px) {
-            .main-content {
-                flex-direction: column;
-            }
-            
-            .action-panel {
-                width: 100%;
-            }
-
-            .quick-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* --- 新增的 Markdown 樣式 --- */
-        .message.assistant .message-content p {
-            margin-bottom: 0.8em; /* 段落間距 */
-        }
-        .message.assistant .message-content p:last-child {
-            margin-bottom: 0;
-        }
-        .message.assistant .message-content strong {
-            color: #b91c1c; /* 資生堂紅，讓重點更明顯 */
-            font-weight: 700;
-        }
-        .message.assistant .message-content ul, 
-        .message.assistant .message-content ol {
-            margin-left: 20px; /* 列表縮排 */
-            margin-bottom: 0.8em;
-        }
-        .message.assistant .message-content li {
-            margin-bottom: 0.4em;
+            font-size: 14px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>資生堂 SHISEIDO</h1>
-            <p>
-                <span class="sparkle">✨</span>
-                AI 美妝顧問
-            </p>
-        </div>
 
-        <div class="main-content">
-            <div class="chat-area">
-                <div class="messages" id="messages">
-                    <div class="message assistant">
-                        <div class="message-content">
-                            您好！歡迎來到資生堂。我是您的專屬美妝顧問，很高興為您服務。請問有什麼可以幫助您的嗎？
-                        </div>
-                    </div>
-                </div>
+<div class="card">
+    <h1>輸入您的 API Key</h1>
+    <p>我們不會保存您的金鑰，資料只會存在您的裝置。</p>
 
-                <div class="quick-buttons">
-                    <p>快速提問：</p>
-                    <div class="quick-grid">
-                        <button class="quick-btn" onclick="sendQuickMessage('你們的暢銷商品是什麼？')">你們的暢銷商品是什麼？</button>
-                        <button class="quick-btn" onclick="sendQuickMessage('資生堂怡麗絲爾品牌的膠原蛋白理念是什麼？')">資生堂怡麗絲爾品牌的膠原蛋白理念是什麼？</button>
-                        <button class="quick-btn" onclick="sendQuickMessage('多效美肌乳的主要功效有哪些？')">多效美肌乳的主要功效有哪些？</button>
-                        <button class="quick-btn" onclick="sendQuickMessage('膠原緊V澎潤霜的成分是什麼？')">膠原緊V澎潤霜的成分是什麼？</button>
-                        <button class="quick-btn" onclick="sendQuickMessage('膠原A醇超導抗皺精華適合什麼人使用？')">膠原A醇超導抗皺精華適合什麼人使用？</button>
-                        <button class="quick-btn" onclick="sendQuickMessage('如何使用膠原新肌光速精華乳？')">膠原新肌光速精華乳有什麼特別技術？</button>
-                    </div>
-                </div>
+    <input type="password" id="apiKeyInput" placeholder="請輸入 Google Gemini API Key…" />
 
-                <div class="input-area">
-                    <input 
-                        type="text" 
-                        id="userInput" 
-                        placeholder="詢問任何關於資生堂產品的問題..."
-                        onkeypress="handleKeyPress(event)"
-                    >
-                    <button class="send-btn" id="sendBtn" onclick="sendMessage()">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="22" y1="2" x2="11" y2="13"></line>
-                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                        </svg>
-                    </button>
-                </div>
-            </div>
+    <button onclick="saveKey()">開始使用</button>
+</div>
 
-            <div class="action-panel">
-                <h3>購買決定</h3>
-                <div class="action-buttons">
-                    <button class="action-btn gray" onclick="handleAction('我不想購買')">我不想購買</button>
-                    <button class="action-btn red" onclick="handleAction('我要購買多效美肌乳')">我要購買多效美肌乳</button>
-                    <button class="action-btn red" onclick="handleAction('我要購買膠原緊V澎潤霜')">我要購買膠原緊V澎潤霜</button>
-                    <button class="action-btn red" onclick="handleAction('我要購買膠原A醇超導抗皺精華')">我要購買膠原A醇超導抗皺精華</button>
-                    <button class="action-btn red" onclick="handleAction('我要購買膠原新肌光速精華乳')">我要購買膠原新肌光速精華乳</button>
-                    <button class="action-btn red" onclick="handleAction('我要購買多項產品')">我要購買多項產品</button>
-                </div>
-                <div class="info-box">
-                    <p>我們的 AI 顧問將協助您找到最適合您獨特美妝需求的資生堂產品。</p>
-                </div>
-            </div>
-        </div>
-    </div>
+<script>
+function saveKey() {
+    const key = document.getElementById("apiKeyInput").value.trim();
 
-    <script>
-        // ⚠️ 請將下方的 API Key 替換為您自己的 Google Gemini API Key
-        const API_KEY = 'AIzaSyDc7j5ADkXOg6sAgHoQnZvh4bgUI5MMvfo';
+    if (!key) {
+        alert("請先輸入 API Key");
+        return;
+    }
 
-        const systemPrompt = `
-你是資生堂（SHISEIDO）的專業親切銷售顧問。你的角色是：
+    // 儲存到瀏覽器，不會上傳
+    localStorage.setItem("GEMINI_API_KEY", key);
 
-1. 熱情接待顧客，了解膚質、需求和困擾
-2. 根據顧客需求推薦適合的資生堂產品
-3. 提供產品功效、成分、使用方法、技術與科學背景
-4. 分享資生堂品牌傳承、品質與創新理念
-5. 解答護膚步驟、產品搭配與美容技巧問題
-6. 創造個人化購物體驗
+    // 導向主程式頁面
+    window.location.href = "app.html";
+}
+</script>
 
-請用繁體中文回答，保持親切、專業、簡潔友善語氣，適度使用表情符號，專注幫助顧客找到最適合產品。
-請盡量精簡回答，避免冗長敘述。
-如果要等使用者回答問題，請簡短詢問並等待回覆。
-
-品牌說明：
-怡麗絲爾膠原蛋白研究超過40年，是膠原專家。
-五大膠原蛋白（13457型）維持肌膚緊緻、彈性與韌性，協助肌膚形成健康循環。
-膠原網結構穩固基底膜，保持表皮光滑、真皮層支撐力強。
-核心理念：保護肌膚基底膜、維持肌膚框架支撐、促進膠原再生與細胞能量。
-
-產品資訊：
-
-多效美肌乳
-功效：全方位保養、抗光老化、防曬、持妝、緊緻澎彈。
-核心技術：膠原修復因子啟動粒線體自我修復，提供細胞能量，改善光線與紫外線傷害。微米級防曬科技均勻舒適防護，取代高劑量防曬，全面提升肌膚防禦膜。
-使用情境：日間保養首選，兼顧防曬與養膚。
-效果重點：緊緻澎彈、透亮光澤、持妝效果。
-
-膠原緊V澎潤霜
-功效：改善肌膚鬆軟、凹陷，提升肌膚緊緻與彈性力。
-核心技術：V型無重力科技改善肌底衰退與肌膚框架無力。V雕塑緊顏精華與V型膠原精華一次滿足五大膠原蛋白（13457型），注入澎彈力。搭配獨創按摩法「一澎、二拉、三定型」重塑肌底。
-成分：甜茶、迷迭香、木莓、地榆根、鳶尾花根、甘草、薄荷、海藻、山竹、柴胡、西洋菜、柑橘萃取。
-使用情境：日常保養注入膠原蛋白，達到緊緻澎彈效果。
-
-膠原A醇超導抗皺精華
-功效：改善皺紋、角質硬厚，釋放真皮壓力，加速膠原新生，使肌膚回彈、平滑細緻。
-核心技術：A醇超導膠原精華滲透肌底，使角質柔軟，釋放真皮壓力，加速膠原新生。
-使用情境：適用於臉部、唇部、頸部紋路，改善角質堆積與粗糙感。
-效果重點：肌膚平滑、光澤、細緻。
-
-膠原新肌光速精華乳
-功效：快速改善多重肌膚問題（抗老、保濕、皺紋改善），效果可即刻見。
-核心技術：新肌酮作用於基底膜，促進表皮與真皮再生，提高膠原蛋白與玻尿酸生成。光速科技乳化技術使精華融入肌膚細胞結構，快速滲透且均勻吸收。
-使用情境：適合希望快速美肌且不喜歡繁瑣保養的人。
-        `;
-
-        let conversationHistory = [];
-        let isLoading = false;
-
-        // function addMessage(role, content) {
-        //     const messagesDiv = document.getElementById('messages');
-        //     const messageDiv = document.createElement('div');
-        //     messageDiv.className = `message ${role}`;
-            
-        //     const contentDiv = document.createElement('div');
-        //     contentDiv.className = 'message-content';
-        //     contentDiv.textContent = content;
-            
-        //     messageDiv.appendChild(contentDiv);
-        //     messagesDiv.appendChild(messageDiv);
-        //     messagesDiv.scrollTop = messagesDiv.scrollHeight;
-
-        //     conversationHistory.push({ role, content });
-        // }
-        function addMessage(role, content) {
-            const messagesDiv = document.getElementById('messages');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${role}`;
-            
-            const contentDiv = document.createElement('div');
-            contentDiv.className = 'message-content';
-            
-            // --- 修改開始 ---
-            if (role === 'assistant') {
-                // 如果是 AI 回覆，使用 marked 解析 Markdown 並放入 innerHTML
-                // 這裡的 parse 會把 **文字** 轉成 <strong>文字</strong>
-                contentDiv.innerHTML = marked.parse(content);
-            } else {
-                // 如果是使用者，保持純文字，避免 HTML 注入攻擊
-                contentDiv.textContent = content;
-            }
-            // --- 修改結束 ---
-            
-            messageDiv.appendChild(contentDiv);
-            messagesDiv.appendChild(messageDiv);
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
-
-            // 注意：存入歷史紀錄時，還是要存原始的 content (純文字)，不要存轉過的 HTML
-            conversationHistory.push({ role, content });
-        }
-
-        function showLoading() {
-            const messagesDiv = document.getElementById('messages');
-            const loadingDiv = document.createElement('div');
-            loadingDiv.id = 'loading';
-            loadingDiv.className = 'message assistant';
-            loadingDiv.innerHTML = `
-                <div class="loading">
-                    <div class="loading-dot"></div>
-                    <div class="loading-dot"></div>
-                    <div class="loading-dot"></div>
-                </div>
-            `;
-            messagesDiv.appendChild(loadingDiv);
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
-        }
-
-        function hideLoading() {
-            const loadingDiv = document.getElementById('loading');
-            if (loadingDiv) {
-                loadingDiv.remove();
-            }
-        }
-
-        function setInputEnabled(enabled) {
-            document.getElementById('userInput').disabled = !enabled;
-            document.getElementById('sendBtn').disabled = !enabled;
-            document.querySelectorAll('.quick-btn').forEach(btn => {
-                btn.disabled = !enabled;
-            });
-        }
-
-        async function sendMessage() {
-            const input = document.getElementById('userInput');
-            const message = input.value.trim();
-            
-            if (!message || isLoading) return;
-
-            if (API_KEY === 'YOUR_GOOGLE_GEMINI_API_KEY_HERE') {
-                alert('請先在程式碼中設定您的 Google Gemini API Key！');
-                return;
-            }
-
-            isLoading = true;
-            setInputEnabled(false);
-            
-            addMessage('user', message);
-            input.value = '';
-            
-            showLoading();
-
-            try {
-                const messages = [
-                    {
-                        role: 'user',
-                        parts: [{ text: systemPrompt }]
-                    },
-                    ...conversationHistory.map(msg => ({
-                        role: msg.role === 'assistant' ? 'model' : 'user',
-                        parts: [{ text: msg.content }]
-                    }))
-                ];
-
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${API_KEY}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        contents: messages,
-                        generationConfig: {
-                            temperature: 0.7,
-                            maxOutputTokens: 8791,
-                        }
-                    })
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    // Log the full error to the console for debugging
-                    console.error('API HTTP Error:', response.status, errorData);
-                    // Throw a specific error for the catch block to handle
-                    throw new Error(`API HTTP Error ${response.status}: ${errorData.error.message || 'Unknown server error.'}`);
-                }
-
-                const data = await response.json();
-                hideLoading();
-                console.log('API Response:', data);
-
-                if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
-                    addMessage('assistant', data.candidates[0].content.parts[0].text);
-                } else {
-                    throw new Error('Invalid response');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                hideLoading();
-                addMessage('assistant', '抱歉，我遇到了一些問題。請稍後再試。');
-            } finally {
-                isLoading = false;
-                setInputEnabled(true);
-                input.focus();
-            }
-        }
-
-        function sendQuickMessage(message) {
-            document.getElementById('userInput').value = message;
-            sendMessage();
-        }
-
-        function handleKeyPress(event) {
-            if (event.key === 'Enter') {
-                sendMessage();
-            }
-        }
-
-        function handleAction(action) {
-            alert(`感謝您！${action}`);
-        }
-
-        // 初始化時聚焦輸入框
-        document.getElementById('userInput').focus();
-    </script>
 </body>
 </html>
