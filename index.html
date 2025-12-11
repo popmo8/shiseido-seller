@@ -579,6 +579,10 @@
     </div>
 
     <script>
+        // 記錄網頁打開時間
+        const pageLoadTime = new Date();
+        console.log('網頁開啟時間:', pageLoadTime.toLocaleString());
+
         // API Key 現在安全地存放在後端環境變數中
         const systemPrompt = `
 你是一位資生堂 SHISEIDO｜怡麗絲爾 ELIXIR 的專業銷售顧問。你的任務是以「問題引導式銷售（Question-led Sales）」方式與顧客互動，打造自然、精準、貼心的購物體驗。你可以「參考」以下提供的「EI-AI銷售員-對話流程」，將其中的節點邏輯、分流方式、賣點順序、產品關聯性、銷售動線等作為你的對話架構參考來源，但不需要逐字照抄或硬性遵守。JSON 用來協助你理解：如何分流新客／舊客、提問順序、產品銜接與行動呼籲方式。
@@ -665,7 +669,7 @@ O99 完成
 5. 每段輸出不超過 2–3 句話，並以一個問題結尾，等待使用者回覆。
 6. 推薦時避免一次講太多，讓顧客透過回答逐步被引導。
 7. 銷售結尾可自然引導行動，例如：「需要我幫你準備這套組合嗎？」、「要不要比較兩款給你看？」
-8. **當察覺到使用者有明確購買意圖時**（例如：表示想購買、詢問價格、詢問如何結帳、表示要下單等），請立即告知：「太好了！為了給您最完善的服務，我們會幫您轉接到真人銷售員，他會協助您完成購買流程 😊」
+8. **當察覺到使用者有明確購買意圖時**（例如：表示想購買、詢問價格、詢問如何結帳、表示要下單等），請立即告知：「太好了！為了給您最完善的服務，請點擊下方「我要購買」按鈕，我們會幫您轉接到真人銷售員，他會協助您完成購買流程 😊」
 9. **絕對不要在回覆中包含任何內部思考過程、推理步驟、或用括號/引號標註的思緒內容。只輸出直接面對顧客的對話內容。**
 
 【注意事項】
@@ -857,7 +861,53 @@ O99 完成
             }
         }
 
-        function handleAction(action) {
+        async function handleAction(action) {
+            // 計算從網頁打開到按下按鈕的時間
+            const clickTime = new Date();
+            const timeDiff = (clickTime - pageLoadTime) / 1000; // 轉換為秒
+            
+            // 判斷是 Yes 還是 No
+            const decision = action === '我要購買' ? 'Yes' : 'No';
+            
+            console.log('═════════════════════════════════');
+            console.log('按鈕被按下:', action);
+            console.log('決定:', decision);
+            console.log('按下時間:', clickTime.toLocaleString());
+            console.log('從打開網頁到按下按鈕的時間:', timeDiff.toFixed(2), '秒');
+            console.log('═════════════════════════════════');
+            
+            // 將數據寫入 Google Sheets
+            try {
+                const response = await fetch('/api/sheets', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        timestamp: clickTime.toLocaleString('zh-TW', { 
+                            timeZone: 'Asia/Taipei',
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            second: '2-digit'
+                        }),
+                        decision: decision,
+                        timeDiff: timeDiff.toFixed(2)
+                    })
+                });
+
+                if (response.ok) {
+                    console.log('✓ 數據已成功寫入 Google Sheets');
+                } else {
+                    const result = await response.json();
+                    console.error('✗ 寫入 Google Sheets 失敗:', result);
+                }
+            } catch (error) {
+                console.error('✗ 寫入 Google Sheets 時發生錯誤:', error);
+            }
+            
             alert(`感謝您！${action}`);
         }
 
