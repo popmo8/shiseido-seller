@@ -65,13 +65,19 @@
             flex: 1;
             display: flex;
             flex-direction: column;
+            margin-bottom: 0;
+            transition: margin-bottom 0.3s ease;
+        }
+
+        .chat-area.toggle-collapsed {
+            margin-bottom: -8px;
         }
 
         .messages {
             flex: 1;
             overflow-y: auto;
             padding: 20px;
-            margin-bottom: 20px;
+            margin-bottom: 12px;
             background: #fafafa;
             border-radius: 8px;
             -webkit-overflow-scrolling: touch; /* 平滑滾動 for iOS */
@@ -135,12 +141,12 @@
         }
 
         .quick-buttons {
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             transition: margin-bottom 0.3s ease;
         }
 
         .quick-buttons.collapsed {
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
         .quick-buttons-header {
@@ -360,13 +366,13 @@
             .main-content {
                 flex-direction: column;
                 padding: 15px;
-                gap: 15px;
+                gap: 8px;
             }
             
             .messages {
                 padding: 15px;
-                margin-bottom: 15px;
-                max-height: 40vh;
+                margin-bottom: 10px;
+                max-height: 50vh;
             }
 
             .message-content {
@@ -376,11 +382,11 @@
             }
 
             .quick-buttons {
-                margin-bottom: 8px;
+                margin-bottom: 6px;
             }
 
             .quick-buttons.collapsed {
-                margin-bottom: 8px;
+                margin-bottom: 6px;
             }
 
             .quick-buttons-header {
@@ -470,7 +476,7 @@
             }
 
             .messages {
-                max-height: 35vh;
+                max-height: 45vh;
             }
 
             .message-content {
@@ -521,7 +527,7 @@
         </div>
 
         <div class="main-content">
-            <div class="chat-area">
+            <div class="chat-area toggle-collapsed">
                 <div class="messages" id="messages">
                     <div class="message assistant">
                         <div class="message-content">
@@ -539,7 +545,6 @@
                     </div>
                     <div class="quick-grid" id="quickGrid">
                         <button class="quick-btn" onclick="sendQuickMessage('你們的暢銷商品是什麼？')">你們的暢銷商品是什麼？</button>
-                        <button class="quick-btn" onclick="sendQuickMessage('資生堂怡麗絲爾品牌的膠原蛋白理念是什麼？')">資生堂怡麗絲爾品牌的膠原蛋白理念是什麼？</button>
                         <button class="quick-btn" onclick="sendQuickMessage('多效美肌乳的主要功效有哪些？')">多效美肌乳的主要功效有哪些？</button>
                         <button class="quick-btn" onclick="sendQuickMessage('膠原緊V澎潤霜的成分是什麼？')">膠原緊V澎潤霜的成分是什麼？</button>
                         <button class="quick-btn" onclick="sendQuickMessage('膠原A醇超導抗皺精華適合什麼人使用？')">膠原A醇超導抗皺精華適合什麼人使用？</button>
@@ -1106,10 +1111,12 @@ EI-AI銷售員-對話流程.json:
             const quickGrid = document.getElementById('quickGrid');
             const toggleIcon = document.getElementById('toggleIcon');
             const quickButtons = document.querySelector('.quick-buttons');
+            const chatArea = document.querySelector('.chat-area');
             
             quickGrid.classList.remove('expanded');
             toggleIcon.classList.remove('expanded');
             quickButtons.classList.add('collapsed');
+            chatArea.classList.add('toggle-collapsed');
         }
 
         function handleKeyPress(event) {
@@ -1126,6 +1133,7 @@ EI-AI銷售員-對話流程.json:
             const quickGrid = document.getElementById('quickGrid');
             const toggleIcon = document.getElementById('toggleIcon');
             const quickButtons = document.querySelector('.quick-buttons');
+            const chatArea = document.querySelector('.chat-area');
             
             quickGrid.classList.toggle('expanded');
             toggleIcon.classList.toggle('expanded');
@@ -1133,8 +1141,10 @@ EI-AI銷售員-對話流程.json:
             // 管理收合狀態的間距
             if (quickGrid.classList.contains('expanded')) {
                 quickButtons.classList.remove('collapsed');
+                chatArea.classList.remove('toggle-collapsed');
             } else {
                 quickButtons.classList.add('collapsed');
+                chatArea.classList.add('toggle-collapsed');
             }
         }
 
