@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>資生堂 SHISEIDO - AI 美妝顧問</title>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
@@ -74,6 +74,7 @@
             margin-bottom: 20px;
             background: #fafafa;
             border-radius: 8px;
+            -webkit-overflow-scrolling: touch; /* 平滑滾動 for iOS */
         }
 
         .message {
@@ -134,20 +135,59 @@
         }
 
         .quick-buttons {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
-        .quick-buttons p {
+        .quick-buttons-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            padding: 12px;
+            background: #fef2f2;
+            border-radius: 8px;
+            transition: all 0.2s;
+            user-select: none;
+            margin-bottom: 0;
+        }
+
+        .quick-buttons-header:hover {
+            background: #fee2e2;
+        }
+
+        .quick-buttons-header p {
             font-size: 14px;
-            color: #6b7280;
+            color: #b91c1c;
             font-weight: 500;
-            margin-bottom: 10px;
+            margin: 0;
+        }
+
+        .toggle-icon {
+            width: 20px;
+            height: 20px;
+            color: #b91c1c;
+            transition: transform 0.3s ease;
+        }
+
+        .toggle-icon.expanded {
+            transform: rotate(180deg);
         }
 
         .quick-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 10px;
+            margin-top: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, opacity 0.3s ease, margin-top 0.3s ease;
+            opacity: 0;
+        }
+
+        .quick-grid.expanded {
+            max-height: 500px;
+            opacity: 1;
+            margin-top: 10px;
         }
 
         .quick-btn {
@@ -292,16 +332,151 @@
         }
 
         @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                height: calc(100vh - 20px);
+            }
+
+            .header {
+                padding: 20px 15px;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .header p {
+                font-size: 14px;
+            }
+
             .main-content {
                 flex-direction: column;
+                padding: 15px;
+                gap: 15px;
             }
             
-            .action-panel {
-                width: 100%;
+            .messages {
+                padding: 15px;
+                margin-bottom: 15px;
+                max-height: 40vh;
+            }
+
+            .message-content {
+                max-width: 85%;
+                padding: 12px;
+                font-size: 14px;
+            }
+
+            .quick-buttons {
+                margin-bottom: 12px;
+            }
+
+            .quick-buttons-header {
+                padding: 10px;
+                margin-bottom: 0;
+            }
+
+            .quick-buttons-header p {
+                font-size: 13px;
+            }
+
+            .toggle-icon {
+                width: 18px;
+                height: 18px;
             }
 
             .quick-grid {
                 grid-template-columns: 1fr;
+                gap: 8px;
+            }
+
+            .quick-grid.expanded {
+                max-height: 800px;
+                margin-top: 8px;
+            }
+
+            .quick-btn {
+                padding: 10px 12px;
+                font-size: 13px;
+            }
+
+            .input-area {
+                gap: 8px;
+            }
+
+            .input-area input {
+                padding: 12px;
+                font-size: 14px;
+            }
+
+            .send-btn {
+                padding: 12px 16px;
+                min-width: 50px;
+            }
+
+            .send-btn svg {
+                width: 18px;
+                height: 18px;
+            }
+            
+            .action-panel {
+                width: 100%;
+                padding: 15px;
+            }
+
+            .action-panel h3 {
+                font-size: 16px;
+                margin-bottom: 12px;
+            }
+
+            .action-buttons {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+
+            .action-btn {
+                padding: 12px 10px;
+                font-size: 12px;
+                text-align: center;
+            }
+
+            .info-box {
+                margin-top: 15px;
+                padding: 12px;
+            }
+
+            .info-box p {
+                font-size: 11px;
+            }
+        }
+
+        /* 針對小螢幕手機 (iPhone SE 等) */
+        @media (max-width: 375px) {
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .messages {
+                max-height: 35vh;
+            }
+
+            .message-content {
+                max-width: 90%;
+                padding: 10px;
+                font-size: 13px;
+            }
+
+            .quick-btn {
+                font-size: 12px;
+            }
+
+            .action-btn {
+                font-size: 11px;
+                padding: 10px 8px;
             }
         }
 
@@ -347,8 +522,13 @@
                 </div>
 
                 <div class="quick-buttons">
-                    <p>快速提問：</p>
-                    <div class="quick-grid">
+                    <div class="quick-buttons-header" onclick="toggleQuickButtons()">
+                        <p>快速提問 💬</p>
+                        <svg class="toggle-icon" id="toggleIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </div>
+                    <div class="quick-grid" id="quickGrid">
                         <button class="quick-btn" onclick="sendQuickMessage('你們的暢銷商品是什麼？')">你們的暢銷商品是什麼？</button>
                         <button class="quick-btn" onclick="sendQuickMessage('資生堂怡麗絲爾品牌的膠原蛋白理念是什麼？')">資生堂怡麗絲爾品牌的膠原蛋白理念是什麼？</button>
                         <button class="quick-btn" onclick="sendQuickMessage('多效美肌乳的主要功效有哪些？')">多效美肌乳的主要功效有哪些？</button>
@@ -377,12 +557,12 @@
             <div class="action-panel">
                 <h3>購買決定</h3>
                 <div class="action-buttons">
-                    <button class="action-btn gray" onclick="handleAction('我不想購買')">我不想購買</button>
                     <button class="action-btn red" onclick="handleAction('我要購買多效美肌乳')">我要購買多效美肌乳</button>
                     <button class="action-btn red" onclick="handleAction('我要購買膠原緊V澎潤霜')">我要購買膠原緊V澎潤霜</button>
                     <button class="action-btn red" onclick="handleAction('我要購買膠原A醇超導抗皺精華')">我要購買膠原A醇超導抗皺精華</button>
                     <button class="action-btn red" onclick="handleAction('我要購買膠原新肌光速精華乳')">我要購買膠原新肌光速精華乳</button>
                     <button class="action-btn red" onclick="handleAction('我要購買多項產品')">我要購買多項產品</button>
+                    <button class="action-btn gray" onclick="handleAction('我不想購買')">我不想購買</button>
                 </div>
                 <div class="info-box">
                     <p>我們的 AI 顧問將協助您找到最適合您獨特美妝需求的資生堂產品。</p>
@@ -929,6 +1109,14 @@ EI-AI銷售員-對話流程.json:
 
         function handleAction(action) {
             alert(`感謝您！${action}`);
+        }
+
+        function toggleQuickButtons() {
+            const quickGrid = document.getElementById('quickGrid');
+            const toggleIcon = document.getElementById('toggleIcon');
+            
+            quickGrid.classList.toggle('expanded');
+            toggleIcon.classList.toggle('expanded');
         }
 
         // 初始化時聚焦輸入框
