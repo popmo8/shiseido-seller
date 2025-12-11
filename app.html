@@ -135,7 +135,12 @@
         }
 
         .quick-buttons {
-            margin-bottom: 15px;
+            margin-bottom: 10px;
+            transition: margin-bottom 0.3s ease;
+        }
+
+        .quick-buttons.collapsed {
+            margin-bottom: 10px;
         }
 
         .quick-buttons-header {
@@ -371,7 +376,11 @@
             }
 
             .quick-buttons {
-                margin-bottom: 12px;
+                margin-bottom: 8px;
+            }
+
+            .quick-buttons.collapsed {
+                margin-bottom: 8px;
             }
 
             .quick-buttons-header {
@@ -439,8 +448,8 @@
             }
 
             .action-btn {
-                padding: 12px 10px;
-                font-size: 12px;
+                padding: 14px 12px;
+                font-size: 14px;
                 text-align: center;
             }
 
@@ -475,8 +484,8 @@
             }
 
             .action-btn {
-                font-size: 11px;
-                padding: 10px 8px;
+                font-size: 13px;
+                padding: 12px 10px;
             }
         }
 
@@ -521,7 +530,7 @@
                     </div>
                 </div>
 
-                <div class="quick-buttons">
+                <div class="quick-buttons collapsed">
                     <div class="quick-buttons-header" onclick="toggleQuickButtons()">
                         <p>快速提問 💬</p>
                         <svg class="toggle-icon" id="toggleIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -557,15 +566,8 @@
             <div class="action-panel">
                 <h3>購買決定</h3>
                 <div class="action-buttons">
-                    <button class="action-btn red" onclick="handleAction('我要購買多效美肌乳')">我要購買多效美肌乳</button>
-                    <button class="action-btn red" onclick="handleAction('我要購買膠原緊V澎潤霜')">我要購買膠原緊V澎潤霜</button>
-                    <button class="action-btn red" onclick="handleAction('我要購買膠原A醇超導抗皺精華')">我要購買膠原A醇超導抗皺精華</button>
-                    <button class="action-btn red" onclick="handleAction('我要購買膠原新肌光速精華乳')">我要購買膠原新肌光速精華乳</button>
-                    <button class="action-btn red" onclick="handleAction('我要購買多項產品')">我要購買多項產品</button>
-                    <button class="action-btn gray" onclick="handleAction('我不想購買')">我不想購買</button>
-                </div>
-                <div class="info-box">
-                    <p>我們的 AI 顧問將協助您找到最適合您獨特美妝需求的資生堂產品。</p>
+                    <button class="action-btn red" onclick="handleAction('我要購買')">我要購買 🛒</button>
+                    <button class="action-btn gray" onclick="handleAction('我再考慮看看')">我再考慮看看 💭</button>
                 </div>
             </div>
         </div>
@@ -1099,6 +1101,15 @@ EI-AI銷售員-對話流程.json:
         function sendQuickMessage(message) {
             document.getElementById('userInput').value = message;
             sendMessage();
+            
+            // 自動收合 toggle list
+            const quickGrid = document.getElementById('quickGrid');
+            const toggleIcon = document.getElementById('toggleIcon');
+            const quickButtons = document.querySelector('.quick-buttons');
+            
+            quickGrid.classList.remove('expanded');
+            toggleIcon.classList.remove('expanded');
+            quickButtons.classList.add('collapsed');
         }
 
         function handleKeyPress(event) {
@@ -1114,9 +1125,17 @@ EI-AI銷售員-對話流程.json:
         function toggleQuickButtons() {
             const quickGrid = document.getElementById('quickGrid');
             const toggleIcon = document.getElementById('toggleIcon');
+            const quickButtons = document.querySelector('.quick-buttons');
             
             quickGrid.classList.toggle('expanded');
             toggleIcon.classList.toggle('expanded');
+            
+            // 管理收合狀態的間距
+            if (quickGrid.classList.contains('expanded')) {
+                quickButtons.classList.remove('collapsed');
+            } else {
+                quickButtons.classList.add('collapsed');
+            }
         }
 
         // 初始化時聚焦輸入框
